@@ -3,44 +3,39 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simple Reviews Admin</title>
+  <title>Admin — Reviews Editor</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;padding:18px;color:#111}
-    .box{max-width:900px;margin:0 auto;background:#fff;padding:14px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
-    h2{margin:0 0 10px 0}
+    body{font-family:Arial,Helvetica,sans-serif;background:#f6f9fc;padding:18px;color:#102a43}
+    .wrap{max-width:960px;margin:0 auto}
+    .panel{background:#fff;padding:14px;border-radius:10px;box-shadow:0 8px 30px rgba(15,23,42,0.06)}
     .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    button{padding:8px 10px;border-radius:6px;border:none;cursor:pointer;font-weight:600}
-    .btn-add{background:#0b75ef;color:#fff}
-    .btn-download{background:#10b981;color:#fff}
-    .btn-copy{background:#2563eb;color:#fff}
+    button{padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+    .btn-add{background:#0b75ef;color:#fff} .btn-download{background:#10b981;color:#fff} .btn-copy{background:#2563eb;color:#fff}
     .list{display:grid;gap:8px}
-    .item{display:flex;gap:8px;align-items:flex-start;background:#fbfdff;padding:8px;border-radius:6px;border:1px solid #e6edf3}
-    textarea{flex:1;border:1px solid #e6edf3;padding:8px;border-radius:6px;min-height:56px;resize:vertical}
+    .item{display:flex;gap:8px;align-items:flex-start;background:#fbfdff;padding:8px;border-radius:8px;border:1px solid #e6edf3}
+    textarea{flex:1;border:1px solid #e6edf3;padding:8px;border-radius:6px;min-height:56px;font-size:14px;resize:vertical}
     .btns{display:flex;flex-direction:column;gap:6px}
     .btns button{padding:6px 8px;border-radius:6px}
-    .note{font-size:13px;color:#475569;margin-top:10px}
+    .hint{font-size:13px;color:#475569;margin-top:8px}
   </style>
 </head>
 <body>
-  <div class="box">
+  <div class="wrap">
     <h2>Admin — Edit Reviews</h2>
-    <div class="controls">
-      <button id="addBtn" class="btn-add">+ Add Review</button>
-      <button id="downloadBtn" class="btn-download">Download reviews.json</button>
-      <button id="copyBtn" class="btn-copy">Copy JSON</button>
+    <div class="panel">
+      <div class="controls">
+        <button id="addBtn" class="btn-add">+ Add Review</button>
+        <button id="downloadBtn" class="btn-download">Download reviews.json</button>
+        <button id="copyBtn" class="btn-copy">Copy JSON</button>
+      </div>
+
+      <div id="list" class="list"></div>
+      <div class="hint">Tip: After Download, go to GitHub repo → Add file → Upload files → select the downloaded reviews.json and Commit.</div>
+      <div id="status" style="margin-top:10px;color:#0b74ef"></div>
     </div>
-
-    <div id="list" class="list"></div>
-
-    <div class="note">
-      Tip: After Download, upload the file to GitHub (Add file → Upload files) or edit the file in GitHub web editor and paste content.
-    </div>
-
-    <div id="status" style="margin-top:10px;color:#0b74ef"></div>
   </div>
 
 <script>
-  // Default reviews (if reviews.json not found)
   const DEFAULT = [
     "Great service! Very professional and quick.",
     "Excellent experience, highly recommended!",
@@ -55,7 +50,7 @@
 
   let reviews = DEFAULT.slice();
 
-  // try load reviews.json from same folder
+  // try to load existing reviews.json when admin.html is served from same folder
   fetch('reviews.json', {cache:'no-store'})
     .then(r => { if(!r.ok) throw 0; return r.json(); })
     .then(js => { if(js && Array.isArray(js.reviews)) reviews = js.reviews.slice(); render(); })
@@ -70,7 +65,7 @@
       const btns = document.createElement('div'); btns.className='btns';
       const up = document.createElement('button'); up.textContent='↑';
       const down = document.createElement('button'); down.textContent='↓';
-      const del = document.createElement('button'); del.textContent='Delete';
+      const del = document.createElement('button'); del.textContent='Delete'; del.style.background='#ef4444'; del.style.color='#fff';
       up.addEventListener('click', ()=> { if(idx>0){ swap(idx, idx-1); } });
       down.addEventListener('click', ()=> { if(idx<reviews.length-1){ swap(idx, idx+1); } });
       del.addEventListener('click', ()=> { reviews.splice(idx,1); render(); });
@@ -88,9 +83,9 @@
     const payload = { reviews: reviews };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download='reviews.json';
+    const a = document.createElement('a'); a.href = url; a.download = 'reviews.json';
     document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    status.innerText = 'Downloaded reviews.json. Now upload to GitHub and replace the old file.';
+    status.innerText = 'Downloaded reviews.json. Upload it to GitHub to update site.';
     setTimeout(()=> status.innerText = '', 3000);
   });
 
@@ -100,14 +95,13 @@
       await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
       status.innerText = 'JSON copied to clipboard. Paste into GitHub editor.';
       setTimeout(()=> status.innerText = '', 3000);
-    } catch(e){
+    }catch(e){
       status.innerText = 'Copy failed — use Download.';
     }
   });
 
-  // initial render when file loaded or default used
-  function init(){ render(); }
-  init();
+  // initial render
+  render();
 </script>
 </body>
 </html>
