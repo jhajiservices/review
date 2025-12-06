@@ -8,139 +8,205 @@
     :root{
       --brand:#0A4DA2;
       --muted:#6b7280;
-      --box:#f4f8ff;
+      --box:#f4f7ff;
       font-family: Arial, sans-serif;
     }
     body{ margin:0; padding:20px; background:#fff; color:#111; }
     .card{
-      max-width:700px; margin:20px auto; border:1px solid #e8ecff;
-      border-radius:14px; padding:20px;
-      box-shadow:0 6px 20px rgba(10,77,162,0.08);
+      max-width:760px; margin:18px auto; border:1px solid #e8f0ff;
+      border-radius:14px; padding:18px;
+      box-shadow:0 6px 20px rgba(10,77,162,0.06);
     }
-    h1{ margin:0 0 10px; font-size:22px; color:var(--brand); }
-    p.lead{ margin:0 0 16px; color:var(--muted); font-size:15px; }
-    .suggestions{ display:grid; gap:12px; }
+    h1{ color:var(--brand); margin:0 0 8px; font-size:20px; }
+    p.lead{ margin:0 0 14px; color:var(--muted); }
+    .suggestions{ display:grid; gap:10px; margin-top:8px; }
     .suggest{
       background:var(--box);
       padding:12px;
       border-radius:10px;
       cursor:pointer;
       border:1px solid transparent;
-      transition:0.2s;
+      transition:all .18s;
     }
-    .suggest:hover{ border-color:var(--brand); }
+    .suggest:hover{
+      transform:translateY(-2px);
+      border-color:rgba(10,77,162,0.12);
+    }
     .suggest.selected{
       border-color:var(--brand);
-      box-shadow:0 4px 12px rgba(10,77,162,0.10);
+      box-shadow:0 6px 18px rgba(10,77,162,0.08);
     }
-    .controls{ margin-top:20px; display:flex; gap:10px; flex-wrap:wrap; }
+    .controls{
+      margin-top:14px; display:flex; gap:10px;
+      flex-wrap:wrap; align-items:center;
+    }
     .btn{
-      background:var(--brand); color:white; border:none;
-      padding:12px 20px; border-radius:10px;
-      font-weight:bold; cursor:pointer; font-size:15px;
+      background:var(--brand); color:#fff;
+      padding:11px 18px; border-radius:10px;
+      border:0; font-weight:700; cursor:pointer;
     }
-    .btn.ghost{ background:white; color:var(--brand); border:1px solid var(--brand); }
-    #status{ font-size:13px; color:var(--muted); margin-top:6px; }
+    .btn.ghost{
+      background:#fff; color:var(--brand);
+      border:1px solid var(--brand);
+    }
+    #status{ margin-top:8px; color:var(--muted); font-size:13px; }
+    .small{ font-size:13px; color:var(--muted); }
   </style>
 </head>
 <body>
+  <div class="card" role="region" aria-label="Review suggest box">
+    <h1>Share your feedback — Jhaji Services</h1>
+    <p class="lead">
+      Wait or tap a line below → then press <b>Copy &amp; Post</b>. 
+      Google Reviews page will open — just paste &amp; submit.
+    </p>
 
-  <div class="card">
-    <h1>Share Your Feedback</h1>
-    <p class="lead">Tap a review suggestion below → Then press <b>Copy & Post</b>. Google review page will open automatically.</p>
-
-    <div class="suggestions" id="suggestions">
-
-      <div class="suggest" data-text="Great and professional service by Jhaji Services. Fast response and reasonable priceGreat and professional service by Jhaji Services. Fast response and reasonable price. Best Electrician in kharadi, Pune. if you find best electrician, Plumber in kharadi & nearby Call jhaji Services”!">
-        “Great and professional service by Jhaji Services. Fast response and reasonable price. Great and professional service by Jhaji Services. Fast response and reasonable price. Best Electrician in kharadi, Pune. if you find best electrician, Plumber in kharadi & nearby Call jhaji Services””
-      </div>
-
-      <div class="suggest" data-text="Excellent electrician in Kharadi! Very quick & clean work. Highly recommended.Caontact & Hire Jhaji Services for best Electrician Services">
-        “Excellent electrician in Kharadi! Very quick & clean work. Highly recommended.Caontact & Hire Jhaji Services for best Electrician Services”
-      </div>
-
-      <div class="suggest" data-text="Quick and reliable plumbing service. Very satisfying experience with Jhaji Services.">
-        “Quick and reliable plumbing service. Very satisfying experience with Jhaji Services.”
-      </div>
-
-      <div class="suggest" data-text="My geyser was installed perfectly. Same-day service provided by Jhaji Services!">
-        “My geyser was installed perfectly. Same-day service provided by Jhaji Services!”
-      </div>
-
-      <div class="suggest" data-text="Affordable price, honest work & fast response. Best home service in Kharadi.">
-        “Affordable price, honest work & fast response. Best home service in Kharadi.”
-      </div>
-
+    <div id="suggestWrap">
+      <div class="small">Loading suggestions…</div>
     </div>
 
     <div class="controls">
-      <button id="copyPostBtn" class="btn">Copy & Post Review</button>
+      <button id="copyPostBtn" class="btn">Copy &amp; Post Review</button>
       <button id="copyBtn" class="btn ghost">Copy Only</button>
     </div>
 
-    <div id="status"></div>
+    <div id="status" aria-live="polite"></div>
   </div>
 
 <script>
-  const REVIEW_SHORT = "https://g.page/r/CV0F0rtdcU-_EBE/review";
-
+  // --- CONFIG ---
   const FALLBACK_URLS = [
-    REVIEW_SHORT,
-    "https://search.google.com/local/writereview?placeid=ChIJm_4Sg76_wjsRm8huP2sSN64",
-    "https://www.google.com/maps/search/?api=1&query=Jhaji+Services+Kharadi+Pune",
-    "https://www.google.com/maps/search/?api=1&query_place_id=ChIJm_4Sg76_wjsRm8huP2sSN64"
+    "https://g.page/r/CV0F0rtdcU-_EBE/review",
+    "https://www.google.com/maps/search/?api=1&query=Jhaji+Services+Kharadi+Pune"
   ];
+  const SUGGESTIONS_JSON = "./suggestions.json"; // yahi file aapne bana li hai
+  const ROTATE_MS = 3000; // 3 second me auto change
 
-  const suggests = document.querySelectorAll(".suggest");
-  let selectedText = suggests[0].dataset.text;
-  suggests[0].classList.add("selected");
+  let suggestions = [];
+  let current = 0;
+  let rotateTimer = null;
 
-  suggests.forEach(el=>{
-    el.addEventListener("click", ()=>{
-      suggests.forEach(s=>s.classList.remove("selected"));
-      el.classList.add("selected");
-      selectedText = el.dataset.text;
-      document.getElementById("status").textContent = "";
-    });
-  });
+  const wrap = document.getElementById("suggestWrap");
+  const statusEl = document.getElementById("status");
 
-  async function copyToClipboard(text){
-    if(navigator.clipboard){
-      try{
-        await navigator.clipboard.writeText(text);
-        return true;
-      }catch{}
+  function renderSuggestions(){
+    if(!suggestions || suggestions.length === 0){
+      wrap.innerHTML = '<div class="small">No suggestions available.</div>';
+      return;
     }
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    const ok = document.execCommand("copy");
-    document.body.removeChild(ta);
-    return ok;
+    const container = document.createElement("div");
+    container.className = "suggestions";
+    suggestions.forEach((text, i)=>{
+      const d = document.createElement("div");
+      d.className = "suggest";
+      d.dataset.idx = i;
+      d.dataset.text = text;
+      d.innerText = text;
+      d.addEventListener("click", ()=> selectIndex(i));
+      container.appendChild(d);
+    });
+    wrap.innerHTML = "";
+    wrap.appendChild(container);
+    selectIndex(0);
+    startRotate();
+  }
+
+  function selectIndex(i){
+    const items = wrap.querySelectorAll(".suggest");
+    items.forEach(x=>x.classList.remove("selected"));
+    const el = items[i];
+    if(el){ el.classList.add("selected"); }
+    current = i;
+  }
+
+  function startRotate(){
+    stopRotate();
+    rotateTimer = setInterval(()=>{
+      if(!suggestions || suggestions.length === 0) return;
+      current = (current + 1) % suggestions.length;
+      selectIndex(current);
+    }, ROTATE_MS);
+  }
+  function stopRotate(){
+    if(rotateTimer) clearInterval(rotateTimer);
+    rotateTimer = null;
+  }
+
+  async function copyText(t){
+    try{
+      if(navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(t);
+        return true;
+      }
+    }catch(e){}
+    try{
+      const ta = document.createElement("textarea");
+      ta.value = t;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      return true;
+    }catch(e){
+      return false;
+    }
   }
 
   function tryOpen(urls){
-    for(const url of urls){
-      const win = window.open(url, "_blank");
-      if(win){ return true; }
+    for(const u of urls){
+      try{
+        const w = window.open(u, "_blank", "noopener,noreferrer");
+        if(w){ w.focus(); return true; }
+      }catch(e){}
     }
     return false;
   }
 
-  document.getElementById("copyPostBtn").addEventListener("click", async ()=>{
-    const ok = await copyToClipboard(selectedText);
-    setTimeout(()=>{ tryOpen(FALLBACK_URLS); },120);
-    document.getElementById("status").textContent = ok
-      ? "Copied! Google Review page opened — paste & submit."
-      : "Please copy manually & paste on Google review page.";
-  });
-
   document.getElementById("copyBtn").addEventListener("click", async ()=>{
-    const ok = await copyToClipboard(selectedText);
-    document.getElementById("status").textContent = ok ? "Copied!" : "Copy not supported — long press to copy.";
+    stopRotate();
+    const t = suggestions[current] || "";
+    const ok = await copyText(t);
+    statusEl.textContent = ok ? "Copied to clipboard!" : "Copy failed — please copy manually.";
+    startRotate();
   });
-</script>
 
+  document.getElementById("copyPostBtn").addEventListener("click", async ()=>{
+    stopRotate();
+    const t = suggestions[current] || "";
+    const ok = await copyText(t);
+    setTimeout(()=>{
+      const opened = tryOpen(FALLBACK_URLS);
+      statusEl.textContent = opened
+        ? "Copied! Google review page opened — paste & submit."
+        : "Copied! Please open Google Reviews manually and paste.";
+    }, 120);
+    startRotate();
+  });
+
+  async function loadSuggestions(){
+    try{
+      const resp = await fetch(SUGGESTIONS_JSON + "?_=" + Date.now(), { cache:"no-store" });
+      if(!resp.ok) throw new Error("fetch failed");
+      const js = await resp.json();
+      if(Array.isArray(js) && js.length>0){
+        suggestions = js;
+        renderSuggestions();
+        return;
+      }
+    }catch(e){
+      // fallback default list
+      suggestions = [
+        "Great and professional service by Jhaji Services. Fast response and reasonable price!",
+        "Excellent electrician in Kharadi! Very quick & clean work. Highly recommended.",
+        "Quick and reliable plumbing service. Very satisfying experience with Jhaji Services.",
+        "My geyser was installed perfectly. Same-day service provided by Jhaji Services!",
+        "Affordable price, honest work & fast response. Best home service in Kharadi."
+      ];
+      renderSuggestions();
+    }
+  }
+
+  loadSuggestions();
+</script>
 </body>
 </html>
