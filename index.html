@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rate Jhaji Services</title>
+  <style>
+    :root{
+      --brand:#0A4DA2;
+      --muted:#6b7280;
+      --box:#f4f8ff;
+      font-family: Arial, sans-serif;
+    }
+    body{ margin:0; padding:20px; background:#fff; color:#111; }
+    .card{
+      max-width:700px; margin:20px auto; border:1px solid #e8ecff;
+      border-radius:14px; padding:20px;
+      box-shadow:0 6px 20px rgba(10,77,162,0.08);
+    }
+    h1{ margin:0 0 10px; font-size:22px; color:var(--brand); }
+    p.lead{ margin:0 0 16px; color:var(--muted); font-size:15px; }
+    .suggestions{ display:grid; gap:12px; }
+    .suggest{
+      background:var(--box);
+      padding:12px;
+      border-radius:10px;
+      cursor:pointer;
+      border:1px solid transparent;
+      transition:0.2s;
+    }
+    .suggest:hover{ border-color:var(--brand); }
+    .suggest.selected{
+      border-color:var(--brand);
+      box-shadow:0 4px 12px rgba(10,77,162,0.10);
+    }
+    .controls{ margin-top:20px; display:flex; gap:10px; flex-wrap:wrap; }
+    .btn{
+      background:var(--brand); color:white; border:none;
+      padding:12px 20px; border-radius:10px;
+      font-weight:bold; cursor:pointer; font-size:15px;
+    }
+    .btn.ghost{ background:white; color:var(--brand); border:1px solid var(--brand); }
+    #status{ font-size:13px; color:var(--muted); margin-top:6px; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Share Your Feedback</h1>
+    <p class="lead">Tap a review suggestion below → Then press <b>Copy & Post</b>. Google review page will open automatically.</p>
+
+    <div class="suggestions" id="suggestions">
+
+      <div class="suggest" data-text="Great and professional service by Jhaji Services. Fast response and reasonable price!">
+        “Great and professional service by Jhaji Services. Fast response and reasonable price!”
+      </div>
+
+      <div class="suggest" data-text="Excellent electrician in Kharadi! Very quick & clean work. Highly recommended.">
+        “Excellent electrician in Kharadi! Very quick & clean work. Highly recommended.”
+      </div>
+
+      <div class="suggest" data-text="Quick and reliable plumbing service. Very satisfying experience with Jhaji Services.">
+        “Quick and reliable plumbing service. Very satisfying experience with Jhaji Services.”
+      </div>
+
+      <div class="suggest" data-text="My geyser was installed perfectly. Same-day service provided by Jhaji Services!">
+        “My geyser was installed perfectly. Same-day service provided by Jhaji Services!”
+      </div>
+
+      <div class="suggest" data-text="Affordable price, honest work & fast response. Best home service in Kharadi.">
+        “Affordable price, honest work & fast response. Best home service in Kharadi.”
+      </div>
+
+    </div>
+
+    <div class="controls">
+      <button id="copyPostBtn" class="btn">Copy & Post Review</button>
+      <button id="copyBtn" class="btn ghost">Copy Only</button>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+<script>
+  const REVIEW_SHORT = "https://g.page/r/CV0F0rtdcU-_EBE/review";
+
+  const FALLBACK_URLS = [
+    REVIEW_SHORT,
+    "https://search.google.com/local/writereview?placeid=ChIJm_4Sg76_wjsRm8huP2sSN64",
+    "https://www.google.com/maps/search/?api=1&query=Jhaji+Services+Kharadi+Pune",
+    "https://www.google.com/maps/search/?api=1&query_place_id=ChIJm_4Sg76_wjsRm8huP2sSN64"
+  ];
+
+  const suggests = document.querySelectorAll(".suggest");
+  let selectedText = suggests[0].dataset.text;
+  suggests[0].classList.add("selected");
+
+  suggests.forEach(el=>{
+    el.addEventListener("click", ()=>{
+      suggests.forEach(s=>s.classList.remove("selected"));
+      el.classList.add("selected");
+      selectedText = el.dataset.text;
+      document.getElementById("status").textContent = "";
+    });
+  });
+
+  async function copyToClipboard(text){
+    if(navigator.clipboard){
+      try{
+        await navigator.clipboard.writeText(text);
+        return true;
+      }catch{}
+    }
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function tryOpen(urls){
+    for(const url of urls){
+      const win = window.open(url, "_blank");
+      if(win){ return true; }
+    }
+    return false;
+  }
+
+  document.getElementById("copyPostBtn").addEventListener("click", async ()=>{
+    const ok = await copyToClipboard(selectedText);
+    setTimeout(()=>{ tryOpen(FALLBACK_URLS); },120);
+    document.getElementById("status").textContent = ok
+      ? "Copied! Google Review page opened — paste & submit."
+      : "Please copy manually & paste on Google review page.";
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", async ()=>{
+    const ok = await copyToClipboard(selectedText);
+    document.getElementById("status").textContent = ok ? "Copied!" : "Copy not supported — long press to copy.";
+  });
+</script>
+
+</body>
+</html>
