@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin — Jhaji Services Reviews</title>
+  <style>
+    body{ font-family: Arial, Helvetica, sans-serif; background:#f6f9fc; padding:18px; color:#102a43; }
+    .wrap{ max-width:980px; margin:0 auto; }
+    h1{ margin:6px 0 12px 0; }
+    .panel{ background:#fff; padding:16px; border-radius:10px; box-shadow:0 8px 30px rgba(15,23,42,0.06); }
+    .controls{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+    button{ padding:10px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+    .btn-add{ background:#0b75ef; color:#fff; }
+    .btn-download{ background:#10b981; color:#fff; }
+    .btn-copy{ background:#2563eb; color:#fff; }
+    .btn-push{ background:#111827; color:#fff; }
+    .list{ margin-top:12px; display:grid; gap:8px; }
+    .item{ display:flex; gap:8px; align-items:center; background:#fbfdff; padding:10px; border-radius:8px; border:1px solid rgba(2,6,23,0.03); }
+    .item textarea{ flex:1; min-height:44px; border-radius:6px; padding:8px; border:1px solid #e6edf3; font-size:15px; resize:vertical; }
+    .item .btns{ display:flex; gap:8px; align-items:center; }
+    .small{ font-size:13px; color:#475569; margin-top:8px; }
+    .github{ margin-top:12px; display:grid; gap:8px; }
+    input, select{ padding:8px 10px; border-radius:8px; border:1px solid #e6edf3; width:100%; }
+    .hint{ font-size:13px; color:#6b7280; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Admin Panel — Jhaji Services Reviews</h1>
+    <div class="panel">
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <button class="btn-add" id="addBtn">+ Add Review</button>
+        <button class="btn-download" id="downloadBtn">Download reviews.json</button>
+        <button class="btn-copy" id="copyJsonBtn">Copy JSON</button>
+        <button class="btn-push" id="pushBtn">Push to GitHub (optional)</button>
+      </div>
+
+      <div class="small">You can edit reviews here. Use Download or Copy if you prefer to update GitHub manually. <strong>Push to GitHub</strong> requires a GitHub token (see below).</div>
+
+      <div class="list" id="list"></div>
+
+      <div class="hint">Tip: After editing, click <strong>Download</strong> and replace the `reviews.json` in your repo via GitHub web UI → Upload files → Commit.</div>
+
+      <hr style="margin:14px 0">
+
+      <div class="github">
+        <label>GitHub Username / Organization (owner): <input id="ghOwner" placeholder="your-github-username-or-org"></label>
+        <label>Repository name: <input id="ghRepo" placeholder="your-repo-name"></label>
+        <label>File path in repo: <input id="ghPath" value="reviews.json"></label>
+        <label>Branch: <input id="ghBranch" value="main"></label>
+        <label>Personal Access Token (use PAT with repo scope) — <span style="color:#dc2626">only enter if you trust this device</span>: <input id="ghToken" placeholder="ghp_..."></label>
+
+        <div class="hint">If you want to push changes automatically, enter details above and click <strong>Push to GitHub</strong>. Otherwise just Download/Copy and update repo manually.</div>
+      </div>
+
+      <div id="status" style="margin-top:12px; font-size:14px; color:#0b74ef;"></div>
+    </div>
+  </div>
+
+<script>
+  const DEFAULT = [
+    "Great service! Very professional and quick.",
+    "Excellent experience, highly recommended!",
+    "Work done perfectly. Fully satisfied with Jhaji Services.",
+    "Fast response and affordable price.",
+    "Very polite and skilled technician. Will hire again."
+  ];
+
+  const listEl = document.getElementById('list');
+  const addBtn = document.getElementById('addBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const copyJsonBtn = document.getElementById('copyJsonBtn');
+  const pushBtn = document.getElementById('pushBtn');
+  const status = document.getElementById('status');
+
+  let reviews = DEFAULT.slice();
+
+  // try load existing reviews.json from same folder (if admin.html served from repo)
+  fetch('reviews.json', {cache:'no-store'}).then(r => {
+    if(!r.ok) throw new Error('no file');
+    return r.json();
+  }).then(data => {
+    if(data && Array.isArray(data.reviews)) reviews = data.reviews.slice();
+    render();
+  }).catch(e => { render(); });
+
+  function render(){
+    listEl.innerHTML = '';
+    reviews.forEach((txt, idx) => {
+      const item = document.createElement('div'); item.className='item';
+      const ta = document.createElement('textarea'); ta.value = txt;
+      ta.addEventListener('input', (e)=> { reviews[idx] = e.target.value; });
+      const btns = document.createElement('div'); btns.className='btns';
+      const up = document.createElement('button'); up.textContent='↑'; up.title='Move up';
+      const down = document.createElement('button'); down.textContent='↓'; down.title='Move down';
+      const del = document.createElement('button'); del.textContent='Delete'; del.style.background='#ef4444'; del.style.color='#fff';
+      up.addEventListener('click', ()=> { if(idx>0){ swap(idx, idx-1); } });
+      down.addEventListener('click', ()=> { if(idx < reviews.length-1){ swap(idx, idx+1); } });
+      del.addEventListener('click', ()=> { reviews.splice(idx,1); render(); });
+      btns.appendChild(up); btns.appendChild(down); btns.appendChild(del);
+      item.appendChild(ta); item.appendChild(btns);
+      listEl.appendChild(item);
+    });
+  }
+
+  function swap(a,b){ const t=reviews[a]; reviews[a]=reviews[b]; reviews[b]=t; render(); }
+
+  addBtn.addEventListener('click', ()=> { reviews.push("New review..."); render(); });
+
+  downloadBtn.addEventListener('click', ()=> {
+    const payload = { reviews: reviews };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='reviews.json'; document.body.appendChild(a); a.click();
+    a.remove(); URL.revokeObjectURL(url);
+    status.innerText = 'Downloaded reviews.json. Now upload to GitHub (replace file).';
+  });
+
+  copyJsonBtn.addEventListener('click', async ()=> {
+    const payload = { reviews: reviews };
+    const txt = JSON.stringify(payload, null, 2);
+    try {
+      await navigator.clipboard.writeText(txt);
+      status.innerText = 'JSON copied to clipboard. Paste into GitHub web editor or save file.';
+    } catch(e) {
+      status.innerText = 'Copy failed — please use Download.';
+    }
+  });
+
+  // PUSH TO GITHUB - optional
+  pushBtn.addEventListener('click', async ()=> {
+    const owner = document.getElementById('ghOwner').value.trim();
+    const repo  = document.getElementById('ghRepo').value.trim();
+    const path  = document.getElementById('ghPath').value.trim() || 'reviews.json';
+    const branch= document.getElementById('ghBranch').value.trim() || 'main';
+    const token = document.getElementById('ghToken').value.trim();
+
+    if(!owner || !repo || !token){ status.innerText = 'Enter owner, repo and token to push.'; return; }
+
+    status.innerText = 'Preparing to push to GitHub...';
+
+    try {
+      // 1) get current file SHA if exists
+      const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+      const getUrl = `${apiBase}?ref=${encodeURIComponent(branch)}`;
+      const headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' };
+
+      let sha = null;
+      const getRes = await fetch(getUrl, { headers });
+      if(getRes.status === 200){
+        const getJson = await getRes.json();
+        sha = getJson.sha;
+      } else if (getRes.status === 404){
+        sha = null; // new file
+      } else {
+        const txt = await getRes.text();
+        throw new Error('GitHub read error: ' + getRes.status + ' ' + txt);
+      }
+
+      // 2) create commit with new content (base64)
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify({ reviews: reviews }, null, 2))));
+      const commitMsg = `Update reviews.json via admin panel (${new Date().toISOString().slice(0,19).replace('T',' ')})`;
+      const body = { message: commitMsg, content: content, branch: branch };
+      if(sha) body.sha = sha;
+
+      const putRes = await fetch(apiBase, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(body)
+      });
+
+      if(putRes.status === 201 || putRes.status === 200){
+        status.innerText = 'Pushed to GitHub successfully!';
+      } else {
+        const errTxt = await putRes.text();
+        throw new Error('GitHub push failed: ' + putRes.status + ' ' + errTxt);
+      }
+    } catch(err){
+      status.innerText = 'Error: ' + (err.message || err);
+    }
+  });
+
+</script>
+</body>
+</html>
