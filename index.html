@@ -3,155 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jhaji Services - Smart Suggestion AI</title>
+    <title>Customer Review Suggestion</title>
 
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            background: #f3f3f3;
             font-family: Arial, sans-serif;
+            background: #f3f3f3;
+            padding: 20px;
         }
 
-        /* Header */
-        .header {
-            background: #ffffff;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .header img {
-            height: 55px;
-        }
-        .brand-name {
-            font-size: 26px;
-            margin-left: 15px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        /* Container */
         .container {
-            max-width: 600px;
+            max-width: 500px;
+            margin: auto;
             background: #fff;
-            margin: 40px auto;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-        h1 {
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             text-align: center;
-            color: #222;
-            margin-bottom: 10px;
-        }
-        p.subtext {
-            text-align: center;
-            color: #555;
-            margin-top: -5px;
         }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            font-size: 17px;
-            border-radius: 7px;
-            border: 1px solid #bbb;
+        h2 {
+            margin-bottom: 15px;
+        }
+
+        #reviewBox {
             margin-top: 20px;
+            background: #eefbea;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            display: none;
         }
 
         button {
-            width: 100%;
-            padding: 13px;
-            margin-top: 15px;
-            background: #007bff;
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-
-        .result {
-            margin-top: 20px;
-            background: #e6f7e7;
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
+            padding: 12px 20px;
             font-size: 17px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
         }
 
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 15px;
-            margin-top: 30px;
-            color: #444;
+        .btn-generate {
+            background: #007bff;
+            color: white;
         }
 
-        .icons img {
-            width: 32px;
-            margin: 6px;
-            vertical-align: middle;
+        .btn-copy {
+            background: #28a745;
+            color: white;
+            margin-top: 10px;
+            display: none;
         }
 
-        .phone {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 5px;
+        .btn-copy:hover {
+            background: #1f7f35;
+        }
+
+        .btn-generate:hover {
+            background: #005ec0;
         }
     </style>
 </head>
-
 <body>
 
-<!-- HEADER -->
-<div class="header">
-    <img src="your-logo.png" alt="Jhaji Services Logo">
-    <div class="brand-name">Jhaji Services</div>
-</div>
-
-<!-- MAIN CARD -->
 <div class="container">
-    <h1>Smart Suggestion AI</h1>
-    <p class="subtext">Electrician • Plumber • AC Repair • Cleaning • Painting</p>
+    <h2>Customer Review Suggestion</h2>
 
-    <input id="query" type="text" placeholder="Enter service type (example: electrician)">
-    <button onclick="suggest()">Get Suggestion</button>
+    <button class="btn-generate" onclick="showReview()">Generate Review</button>
 
-    <div id="result" class="result"></div>
-</div>
+    <div id="reviewBox"></div>
 
-<!-- FOOTER -->
-<div class="footer">
-    <div class="phone">📞 +91 9545956521</div>
-    <div class="icons">
-        <img src="facebook.png">
-        <img src="instagram.png">
-        <img src="youtube.png">
-        <img src="google.png">
-    </div>
-    <div>© 2025 Jhaji Services — All Rights Reserved</div>
+    <button class="btn-copy" id="copyBtn" onclick="copyReview()">Copy Review</button>
 </div>
 
 <script>
-    async function suggest() {
-        const query = document.getElementById("query").value.toLowerCase();
-        const response = await fetch("suggestion.json");
-        const data = await response.json();
+    const reviews = [
+        "Great service! Very professional and quick.",
+        "Excellent experience, highly recommended!",
+        "Work done perfectly. I’m fully satisfied.",
+        "Very polite and skilled technician.",
+        "Fast response and affordable price.",
+        "Good service and clean work.",
+        "Quality work at a reasonable price.",
+        "On-time service, totally satisfied.",
+        "Amazing experience! Will book again.",
+        "Helpful and trustworthy service provider.",
+        "Fantastic work! Problem solved quickly.",
+        "Very professional behavior and neat work.",
+        "Service was smooth and hassle-free.",
+        "Highly impressed with the service quality.",
+        "Reliable and excellent service provider."
+    ];
 
-        const resultBox = document.getElementById("result");
+    function showReview() {
+        const randomReview = reviews[Math.floor(Math.random() * reviews.length)];
+        document.getElementById("reviewBox").style.display = "block";
+        document.getElementById("reviewBox").innerText = randomReview;
+        document.getElementById("copyBtn").style.display = "inline-block";
+    }
 
-        if (data[query]) {
-            resultBox.style.display = "block";
-            resultBox.innerHTML = `<b>Suggestion:</b> ${data[query]}`;
-        } else {
-            resultBox.style.display = "block";
-            resultBox.innerHTML = "No suggestion found for this category.";
-        }
+    function copyReview() {
+        const text = document.getElementById("reviewBox").innerText;
+        navigator.clipboard.writeText(text);
+
+        document.getElementById("copyBtn").innerText = "Copied!";
+        setTimeout(() => {
+            document.getElementById("copyBtn").innerText = "Copy Review";
+        }, 1500);
     }
 </script>
 
