@@ -1,91 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jhaji Services - Quick Review</title>
-  <style>
-    body{font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;margin:0;padding:18px;color:#111}
-    .card{max-width:820px;margin:12px auto;background:#fff;padding:18px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.06)}
-    h1{margin:0 0 8px 0}
-    .list{display:grid;gap:10px;margin-top:14px}
-    .item{padding:12px;border-radius:8px;background:#f7fff9;cursor:pointer;border:1px solid transparent}
-    .item:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(8,120,60,0.06)}
-    .selected{background:#e6fbec;border-color:#78c778}
-    #selectedBox{display:none;margin-top:12px;padding:12px;border-radius:8px;background:#fff9f0;border:1px solid #efd8b0}
-    .action{margin-top:12px}
-    .btn{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,#0b75ef,#0066d6);color:#fff;font-weight:700;cursor:pointer}
-    .btn:disabled{opacity:0.6;cursor:not-allowed}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Jhaji Services – AI✨ Suggest Review</title>
+<meta name="description" content="Select a suggested review for Jhaji Services, copy & post to Google.">
+
+<style>
+  :root{
+    --bg:#f1f3f4;
+    --card:#ffffff;
+    --primary:#1a73e8;
+    --muted:#5f6368;
+    --radius:12px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:#202124;
+    -webkit-font-smoothing:antialiased;
+    padding:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+  }
+
+  .wrap{ width:100%; max-width:600px; }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:0 8px 30px rgba(60,64,67,0.08);
+    border:1px solid rgba(60,64,67,0.04);
+  }
+
+  .header{ display:flex; gap:14px; align-items:center; }
+  /* Animated medium logo */
+  .logo{
+    width:58px;
+    height:58px;
+    border-radius:12px;
+    object-fit:contain;
+    background:#fff;
+    padding:6px;
+    box-shadow:0 6px 18px rgba(60,64,67,0.10);
+    animation: logoPulse 3000ms ease-in-out infinite;
+    flex:0 0 auto;
+  }
+  @keyframes logoPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  .title-col{ flex:1; min-width:0; }
+  .title{ margin:0; font-size:18px; font-weight:700; display:flex; gap:8px; align-items:center; color:#202124; }
+  .ai-badge{
+    font-size:12px;
+    color:#fff;
+    font-weight:600;
+    padding:5px 9px;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--primary),#0d5ec5);
+    box-shadow:0 4px 12px rgba(26,115,232,0.18);
+  }
+  .subtitle{ margin-top:6px; font-size:13px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .list{ margin-top:14px; display:grid; gap:10px; }
+  .item{
+    background:#f8fbff;
+    padding:12px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    border:1px solid transparent;
+    transition: transform .12s, box-shadow .12s, background .12s, border-color .12s;
+    color:#202124;
+    text-align:left;
+    user-select:none;
+  }
+  .item:focus{ outline:2px solid rgba(26,115,232,0.14); outline-offset:3px; }
+  .item:hover{ transform:translateY(-3px); box-shadow:0 10px 22px rgba(26,115,232,0.06); }
+  .item.selected{
+    background:#e3efff;
+    border-color:rgba(26,115,232,0.20);
+    box-shadow:0 14px 30px rgba(26,115,232,0.10);
+    color:#0a2b5b;
+  }
+
+  .controls{ margin-top:14px; display:flex; gap:10px; align-items:center; }
+  .btn{
+    flex:1; padding:12px; border-radius:10px; border:none; cursor:pointer;
+    background:linear-gradient(90deg,var(--primary),#1558c0);
+    color:#fff; font-weight:700; box-shadow:0 10px 30px rgba(26,115,232,0.12);
+  }
+  .btn:disabled{ opacity:0.6; cursor:not-allowed; box-shadow:none; }
+  .small{ margin-top:12px; font-size:13px; color:var(--muted); text-align:center; }
+
+  /* responsive */
+  @media(max-width:520px){
+    body{ padding:14px; }
+    .card{ padding:14px; }
+    .logo{ width:50px; height:50px; padding:5px; }
+    .title{ font-size:16px; }
+  }
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>Jhaji Services — Quick Review Suggestions</h1>
-    <p style="margin:6px 0 0 0;color:#555">Click a suggestion → then click "Copy & Post Review ✍🏻" to open Google and paste the review.</p>
+  <div class="wrap">
+    <div class="card" role="article" aria-label="Jhaji Services review suggestions">
+      <div class="header">
+        <!-- Put your uploaded logo file named exactly "logo.png" in the same folder -->
+        <img src="logo.png" alt="Jhaji Services Logo" class="logo" id="logoImg" onerror="this.style.display='none'">
 
-    <div id="list" class="list" aria-label="review suggestions"></div>
+        <div class="title-col">
+          <div class="title">
+            Jhaji Services
+            <span class="ai-badge">AI✨ Suggest Review</span>
+          </div>
+          <div class="subtitle" title="Simply select a review and tap Copy & Post Review">
+            Simply select a review and tap Copy & Post Review
+          </div>
+        </div>
+      </div>
 
-    <div id="selectedBox">
-      <div><strong>Selected:</strong></div>
-      <div id="selectedText" style="margin-top:8px"></div>
-    </div>
+      <div class="list" id="list" aria-live="polite"></div>
 
-    <div class="action">
-      <button id="actionBtn" class="btn" disabled>Copy & Post Review ✍🏻</button>
+      <div class="controls">
+        <button id="copyBtn" class="btn" disabled>Copy & Post Review ✍🏻</button>
+      </div>
+
+      <div class="small">Copy hone ke baad Google review box me paste karke Post kar dijiye.</div>
     </div>
   </div>
 
 <script>
-  const GMB_LINK = "https://g.page/r/CV0F0rtdcU-_EBE/review";
+  // Final behavior
+  const GMB = "https://g.page/r/CV0F0rtdcU-_EBE/review";
+  // final suggested reviews — edit here if you want different lines
+  const reviews = [
+    "Great and quick service! Very professional technician.",
+    "Very satisfied with the work. Fast response and clean service.",
+    "Excellent experience! Honest pricing and skilled team.",
+    "Good service at a reasonable price. Highly recommended!"
+  ];
+
   const listEl = document.getElementById('list');
-  const selectedBox = document.getElementById('selectedBox');
-  const selectedTextEl = document.getElementById('selectedText');
-  const actionBtn = document.getElementById('actionBtn');
+  const copyBtn = document.getElementById('copyBtn');
 
-  let reviews = [];
   let selectedText = "";
+  let selectedEl = null;
 
-  // load reviews.json with cache-bust
-  fetch('reviews.json?ts=' + Date.now(), {cache:'no-store'})
-    .then(r => { if(!r.ok) throw 0; return r.json(); })
-    .then(js => { reviews = js.reviews || []; render(); })
-    .catch(() => { reviews = ["Great service! Very professional and quick.","Excellent experience!"]; render(); });
-
-  function render(){
-    listEl.innerHTML = '';
-    reviews.forEach((txt) => {
+  function render() {
+    listEl.innerHTML = "";
+    reviews.forEach((txt, i) => {
       const d = document.createElement('div');
       d.className = 'item';
       d.tabIndex = 0;
       d.innerText = txt;
-      d.addEventListener('click', ()=> selectReview(d, txt));
-      d.addEventListener('keydown', (e)=> { if(e.key === 'Enter' || e.key===' ') selectReview(d, txt); });
+      d.addEventListener('click', () => select(i, d));
+      d.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(i, d); }
+        if (e.key === 'ArrowDown') { e.preventDefault(); focusNext(i); }
+        if (e.key === 'ArrowUp') { e.preventDefault(); focusPrev(i); }
+      });
       listEl.appendChild(d);
     });
-    // auto-select first if exists
-    const first = document.querySelector('.item');
-    if(first) first.click();
+    // auto-select first for convenience
+    const first = listEl.querySelector('.item');
+    if (first) first.focus();
   }
 
-  function selectReview(el, txt){
-    document.querySelectorAll('.item').forEach(i=>i.classList.remove('selected'));
+  function focusNext(i){
+    const items = Array.from(document.querySelectorAll('.item'));
+    const next = items[i+1] || items[0];
+    next.focus();
+  }
+  function focusPrev(i){
+    const items = Array.from(document.querySelectorAll('.item'));
+    const prev = items[i-1] || items[items.length-1];
+    prev.focus();
+  }
+
+  function select(i, el) {
+    if (selectedEl) selectedEl.classList.remove('selected');
     el.classList.add('selected');
-    selectedText = txt;
-    selectedTextEl.innerText = txt;
-    selectedBox.style.display = 'block';
-    actionBtn.disabled = false;
+    selectedEl = el;
+    selectedText = reviews[i];
+    copyBtn.disabled = false;
   }
 
-  async function copyAndOpen(){
-    if(!selectedText) return;
-    try{ await navigator.clipboard.writeText(selectedText); }
-    catch(e){ /* ignore */ }
-    // open GMB review page
-    window.open(GMB_LINK, '_blank');
-  }
+  copyBtn.addEventListener('click', async () => {
+    if (!selectedText) return;
+    try {
+      await navigator.clipboard.writeText(selectedText);
+    } catch (e) {
+      // ignore; some browsers may block clipboard on file:// — still open GMB so user can paste manually
+    }
+    window.open(GMB, '_blank');
+  });
 
-  actionBtn.addEventListener('click', copyAndOpen);
-  actionBtn.addEventListener('keydown', (e)=> { if(e.key === 'Enter' || e.key===' ') copyAndOpen(); });
+  // initialize
+  render();
 </script>
 </body>
 </html>
