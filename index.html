@@ -3,125 +3,89 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jhaji Services — Quick Review</title>
-
+  <title>Jhaji Services - Quick Review</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f4f7fb; padding:20px; }
-    .wrap {
-      max-width:720px; margin:auto; background:#fff; padding:20px;
-      border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1);
-    }
-    h1 { font-size:22px; margin-bottom:10px; }
-    p { color:#444; }
-
-    .suggestions {
-      display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:10px; margin-top:15px;
-    }
-    .suggestion {
-      background:#f2fbf2; padding:12px; border-radius:8px; cursor:pointer;
-      border:1px solid transparent; transition:.15s;
-    }
-    .suggestion:hover { transform:translateY(-3px); }
-    .suggestion.selected {
-      background:#dbf5db; border-color:#78c778;
-    }
-
-    #selectedBox {
-      display:none; background:#fff6e1; padding:14px;
-      border-radius:8px; border:1px solid #e8d4a5; margin-top:15px;
-    }
-
-    .controls { margin-top:14px; }
-    button {
-      width:100%;
-      padding:14px 18px; border:none; border-radius:8px;
-      font-size:17px; cursor:pointer;
-      background:#0b75ef; color:#fff;
-    }
-    button:disabled { opacity:0.5; cursor:not-allowed; }
-
-    #statusMsg {
-      margin-top:10px;
-      font-size:14px;
-      color:#2d6b2d;
-      visibility:hidden;
-      text-align:center;
-    }
+    body{font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;margin:0;padding:18px;color:#111}
+    .card{max-width:820px;margin:12px auto;background:#fff;padding:18px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.06)}
+    h1{margin:0 0 8px 0}
+    .list{display:grid;gap:10px;margin-top:14px}
+    .item{padding:12px;border-radius:8px;background:#f7fff9;cursor:pointer;border:1px solid transparent}
+    .item:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(8,120,60,0.06)}
+    .selected{background:#e6fbec;border-color:#78c778}
+    #selectedBox{display:none;margin-top:12px;padding:12px;border-radius:8px;background:#fff9f0;border:1px solid #efd8b0}
+    .action{margin-top:12px}
+    .btn{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,#0b75ef,#0066d6);color:#fff;font-weight:700;cursor:pointer}
+    .btn:disabled{opacity:0.6;cursor:not-allowed}
   </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Jhaji Services — Quick Review Suggestions</h1>
+    <p style="margin:6px 0 0 0;color:#555">Click a suggestion → then click "Copy & Post Review ✍🏻" to open Google and paste the review.</p>
 
-  <div class="wrap">
-    <h1>Jhaji Services — Quick Review</h1>
-    <p>Select a review below → click “Copy & Post Review ✍🏻” → paste on Google.</p>
+    <div id="list" class="list" aria-label="review suggestions"></div>
 
-    <!-- Review Suggestions -->
-    <div class="suggestions" id="suggestionsList"></div>
+    <div id="selectedBox">
+      <div><strong>Selected:</strong></div>
+      <div id="selectedText" style="margin-top:8px"></div>
+    </div>
 
-    <!-- Selected Review Display -->
-    <div id="selectedBox"></div>
-
-    <!-- Main Action Button -->
-    <div class="controls">
-      <button id="actionBtn" onclick="copyAndPost()" disabled>Copy & Post Review ✍🏻</button>
-      <div id="statusMsg">Copied!</div>
+    <div class="action">
+      <button id="actionBtn" class="btn" disabled>Copy & Post Review ✍🏻</button>
     </div>
   </div>
 
-  <script>
-    const suggestions = [
-      "Great service! Very professional and quick.",
-      "Excellent experience, highly recommended!",
-      "Work done perfectly. Fully satisfied with Jhaji Services.",
-      "Fast response and affordable price.",
-      "Very polite and skilled technician. Will hire again."
-    ];
+<script>
+  const GMB_LINK = "https://g.page/r/CV0F0rtdcU-_EBE/review";
+  const listEl = document.getElementById('list');
+  const selectedBox = document.getElementById('selectedBox');
+  const selectedTextEl = document.getElementById('selectedText');
+  const actionBtn = document.getElementById('actionBtn');
 
-    const suggestionsList = document.getElementById('suggestionsList');
-    const selectedBox   = document.getElementById('selectedBox');
-    const actionBtn     = document.getElementById('actionBtn');
-    const statusMsg     = document.getElementById('statusMsg');
+  let reviews = [];
+  let selectedText = "";
 
-    let selectedText = "";
+  // load reviews.json with cache-bust
+  fetch('reviews.json?ts=' + Date.now(), {cache:'no-store'})
+    .then(r => { if(!r.ok) throw 0; return r.json(); })
+    .then(js => { reviews = js.reviews || []; render(); })
+    .catch(() => { reviews = ["Great service! Very professional and quick.","Excellent experience!"]; render(); });
 
-    // Render suggestions
-    suggestions.forEach((text) => {
-      const div = document.createElement('div');
-      div.className = "suggestion";
-      div.innerText = text;
-      div.onclick = () => selectSuggestion(div, text);
-      suggestionsList.appendChild(div);
+  function render(){
+    listEl.innerHTML = '';
+    reviews.forEach((txt) => {
+      const d = document.createElement('div');
+      d.className = 'item';
+      d.tabIndex = 0;
+      d.innerText = txt;
+      d.addEventListener('click', ()=> selectReview(d, txt));
+      d.addEventListener('keydown', (e)=> { if(e.key === 'Enter' || e.key===' ') selectReview(d, txt); });
+      listEl.appendChild(d);
     });
+    // auto-select first if exists
+    const first = document.querySelector('.item');
+    if(first) first.click();
+  }
 
-    function selectSuggestion(el, text) {
-      document.querySelectorAll(".suggestion").forEach(s => s.classList.remove("selected"));
-      el.classList.add("selected");
+  function selectReview(el, txt){
+    document.querySelectorAll('.item').forEach(i=>i.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedText = txt;
+    selectedTextEl.innerText = txt;
+    selectedBox.style.display = 'block';
+    actionBtn.disabled = false;
+  }
 
-      selectedText = text;
-      selectedBox.style.display = "block";
-      selectedBox.innerHTML = `<strong>Selected Review:</strong><br><br>${text}`;
+  async function copyAndOpen(){
+    if(!selectedText) return;
+    try{ await navigator.clipboard.writeText(selectedText); }
+    catch(e){ /* ignore */ }
+    // open GMB review page
+    window.open(GMB_LINK, '_blank');
+  }
 
-      actionBtn.disabled = false;
-    }
-
-    function copyAndPost() {
-      if (!selectedText) return;
-
-      // Copy text to clipboard
-      navigator.clipboard.writeText(selectedText).then(() => {
-        statusMsg.innerText = "Review Copied! Redirecting...";
-        statusMsg.style.visibility = "visible";
-
-        setTimeout(() => {
-          statusMsg.style.visibility = "hidden";
-        }, 2000);
-      });
-
-      // Open your direct GMB review link
-      window.open("https://g.page/r/CV0F0rtdcU-_EBE/review", "_blank");
-    }
-  </script>
-
+  actionBtn.addEventListener('click', copyAndOpen);
+  actionBtn.addEventListener('keydown', (e)=> { if(e.key === 'Enter' || e.key===' ') copyAndOpen(); });
+</script>
 </body>
 </html>
