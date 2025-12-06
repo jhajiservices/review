@@ -1,117 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Review Suggestion</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jhaji Services — Quick Review</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f3f3f3;
-            padding: 20px;
-        }
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f7fb; padding:20px; }
+    .wrap {
+      max-width:720px; margin:auto; background:#fff; padding:20px;
+      border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1);
+    }
+    h1 { font-size:22px; margin-bottom:10px; }
+    p { color:#444; }
 
-        .container {
-            max-width: 500px;
-            margin: auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
+    .suggestions {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px; margin-top:15px;
+    }
+    .suggestion {
+      background:#f2fbf2; padding:12px; border-radius:8px; cursor:pointer;
+      border:1px solid transparent; transition:.15s;
+    }
+    .suggestion:hover { transform:translateY(-3px); }
+    .suggestion.selected {
+      background:#dbf5db; border-color:#78c778;
+    }
 
-        h2 {
-            margin-bottom: 15px;
-        }
+    #selectedBox {
+      display:none; background:#fff6e1; padding:14px;
+      border-radius:8px; border:1px solid #e8d4a5; margin-top:15px;
+    }
 
-        #reviewBox {
-            margin-top: 20px;
-            background: #eefbea;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 18px;
-            display: none;
-        }
+    .controls { margin-top:14px; }
+    button {
+      width:100%;
+      padding:14px 18px; border:none; border-radius:8px;
+      font-size:17px; cursor:pointer;
+      background:#0b75ef; color:#fff;
+    }
+    button:disabled { opacity:0.5; cursor:not-allowed; }
 
-        button {
-            padding: 12px 20px;
-            font-size: 17px;
-            border: none;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-
-        .btn-generate {
-            background: #007bff;
-            color: white;
-        }
-
-        .btn-copy {
-            background: #28a745;
-            color: white;
-            margin-top: 10px;
-            display: none;
-        }
-
-        .btn-copy:hover {
-            background: #1f7f35;
-        }
-
-        .btn-generate:hover {
-            background: #005ec0;
-        }
-    </style>
+    #statusMsg {
+      margin-top:10px;
+      font-size:14px;
+      color:#2d6b2d;
+      visibility:hidden;
+      text-align:center;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Customer Review Suggestion</h2>
+  <div class="wrap">
+    <h1>Jhaji Services — Quick Review</h1>
+    <p>Select a review below → click “Copy & Post Review ✍🏻” → paste on Google.</p>
 
-    <button class="btn-generate" onclick="showReview()">Generate Review</button>
+    <!-- Review Suggestions -->
+    <div class="suggestions" id="suggestionsList"></div>
 
-    <div id="reviewBox"></div>
+    <!-- Selected Review Display -->
+    <div id="selectedBox"></div>
 
-    <button class="btn-copy" id="copyBtn" onclick="copyReview()">Copy Review</button>
-</div>
+    <!-- Main Action Button -->
+    <div class="controls">
+      <button id="actionBtn" onclick="copyAndPost()" disabled>Copy & Post Review ✍🏻</button>
+      <div id="statusMsg">Copied!</div>
+    </div>
+  </div>
 
-<script>
-    const reviews = [
-        "Great service! Very professional and quick.",
-        "Excellent experience, highly recommended!",
-        "Work done perfectly. I’m fully satisfied.",
-        "Very polite and skilled technician.",
-        "Fast response and affordable price.",
-        "Good service and clean work.",
-        "Quality work at a reasonable price.",
-        "On-time service, totally satisfied.",
-        "Amazing experience! Will book again.",
-        "Helpful and trustworthy service provider.",
-        "Fantastic work! Problem solved quickly.",
-        "Very professional behavior and neat work.",
-        "Service was smooth and hassle-free.",
-        "Highly impressed with the service quality.",
-        "Reliable and excellent service provider."
+  <script>
+    const suggestions = [
+      "Great service! Very professional and quick.",
+      "Excellent experience, highly recommended!",
+      "Work done perfectly. Fully satisfied with Jhaji Services.",
+      "Fast response and affordable price.",
+      "Very polite and skilled technician. Will hire again."
     ];
 
-    function showReview() {
-        const randomReview = reviews[Math.floor(Math.random() * reviews.length)];
-        document.getElementById("reviewBox").style.display = "block";
-        document.getElementById("reviewBox").innerText = randomReview;
-        document.getElementById("copyBtn").style.display = "inline-block";
+    const suggestionsList = document.getElementById('suggestionsList');
+    const selectedBox   = document.getElementById('selectedBox');
+    const actionBtn     = document.getElementById('actionBtn');
+    const statusMsg     = document.getElementById('statusMsg');
+
+    let selectedText = "";
+
+    // Render suggestions
+    suggestions.forEach((text) => {
+      const div = document.createElement('div');
+      div.className = "suggestion";
+      div.innerText = text;
+      div.onclick = () => selectSuggestion(div, text);
+      suggestionsList.appendChild(div);
+    });
+
+    function selectSuggestion(el, text) {
+      document.querySelectorAll(".suggestion").forEach(s => s.classList.remove("selected"));
+      el.classList.add("selected");
+
+      selectedText = text;
+      selectedBox.style.display = "block";
+      selectedBox.innerHTML = `<strong>Selected Review:</strong><br><br>${text}`;
+
+      actionBtn.disabled = false;
     }
 
-    function copyReview() {
-        const text = document.getElementById("reviewBox").innerText;
-        navigator.clipboard.writeText(text);
+    function copyAndPost() {
+      if (!selectedText) return;
 
-        document.getElementById("copyBtn").innerText = "Copied!";
+      // Copy text to clipboard
+      navigator.clipboard.writeText(selectedText).then(() => {
+        statusMsg.innerText = "Review Copied! Redirecting...";
+        statusMsg.style.visibility = "visible";
+
         setTimeout(() => {
-            document.getElementById("copyBtn").innerText = "Copy Review";
-        }, 1500);
+          statusMsg.style.visibility = "hidden";
+        }, 2000);
+      });
+
+      // Open your direct GMB review link
+      window.open("https://g.page/r/CV0F0rtdcU-_EBE/review", "_blank");
     }
-</script>
+  </script>
 
 </body>
 </html>
