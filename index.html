@@ -38,7 +38,8 @@
   }
 
   .header{ display:flex; gap:14px; align-items:center; }
-  /* Animated medium logo */
+
+  /* Animated Logo */
   .logo{
     width:58px;
     height:58px;
@@ -58,6 +59,7 @@
 
   .title-col{ flex:1; min-width:0; }
   .title{ margin:0; font-size:18px; font-weight:700; display:flex; gap:8px; align-items:center; color:#202124; }
+
   .ai-badge{
     font-size:12px;
     color:#fff;
@@ -67,9 +69,11 @@
     background:linear-gradient(90deg,var(--primary),#0d5ec5);
     box-shadow:0 4px 12px rgba(26,115,232,0.18);
   }
-  .subtitle{ margin-top:6px; font-size:13px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .subtitle{ margin-top:6px; font-size:13px; color:var(--muted); }
 
   .list{ margin-top:14px; display:grid; gap:10px; }
+
   .item{
     background:#f8fbff;
     padding:12px 14px;
@@ -81,8 +85,8 @@
     text-align:left;
     user-select:none;
   }
-  .item:focus{ outline:2px solid rgba(26,115,232,0.14); outline-offset:3px; }
   .item:hover{ transform:translateY(-3px); box-shadow:0 10px 22px rgba(26,115,232,0.06); }
+
   .item.selected{
     background:#e3efff;
     border-color:rgba(26,115,232,0.20);
@@ -96,10 +100,10 @@
     background:linear-gradient(90deg,var(--primary),#1558c0);
     color:#fff; font-weight:700; box-shadow:0 10px 30px rgba(26,115,232,0.12);
   }
-  .btn:disabled{ opacity:0.6; cursor:not-allowed; box-shadow:none; }
+  .btn:disabled{ opacity:0.6; cursor:not-allowed; }
+
   .small{ margin-top:12px; font-size:13px; color:var(--muted); text-align:center; }
 
-  /* responsive */
   @media(max-width:520px){
     body{ padding:14px; }
     .card{ padding:14px; }
@@ -110,100 +114,79 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="card" role="article" aria-label="Jhaji Services review suggestions">
+    <div class="card">
       <div class="header">
-        <!-- Put your uploaded logo file named exactly "logo.png" in the same folder -->
-        <img src="logo.png" alt="Jhaji Services Logo" class="logo" id="logoImg" onerror="this.style.display='none'">
-
+        <img src="logo.png" alt="Jhaji Services Logo" class="logo">
         <div class="title-col">
           <div class="title">
             Jhaji Services
             <span class="ai-badge">AI✨ Suggest Review</span>
           </div>
-          <div class="subtitle" title="Simply select a review and tap Copy & Post Review">
-            Simply select a review and tap Copy & Post Review
-          </div>
+          <div class="subtitle">Simply select a review and tap Copy & Post Review</div>
         </div>
       </div>
 
-      <div class="list" id="list" aria-live="polite"></div>
+      <div class="list" id="list"></div>
 
       <div class="controls">
         <button id="copyBtn" class="btn" disabled>Copy & Post Review ✍🏻</button>
       </div>
 
       <div class="small">Copy hone ke baad Google review box me paste karke Post kar dijiye.</div>
+
+      <!-- NEW LINE ADDED -->
+      <div class="small" style="margin-top:4px; font-size:12px; color:#6d6d6d;">
+        You can also edit the review before posting.
+      </div>
+
     </div>
   </div>
 
 <script>
-  // Final behavior
-  const GMB = "https://g.page/r/CV0F0rtdcU-_EBE/review";
-  // final suggested reviews — edit here if you want different lines
-  const reviews = [
-    "Great and quick service! Very professional technician.",
-    "Very satisfied with the work. Fast response and clean service.",
-    "Excellent experience! Honest pricing and skilled team.",
-    "Good service at a reasonable price. Highly recommended!"
-  ];
+let reviews = [];
+let selectedEl = null;
+let selectedText = "";
+const listEl = document.getElementById("list");
+const copyBtn = document.getElementById("copyBtn");
 
-  const listEl = document.getElementById('list');
-  const copyBtn = document.getElementById('copyBtn');
-
-  let selectedText = "";
-  let selectedEl = null;
-
-  function render() {
-    listEl.innerHTML = "";
-    reviews.forEach((txt, i) => {
-      const d = document.createElement('div');
-      d.className = 'item';
-      d.tabIndex = 0;
-      d.innerText = txt;
-      d.addEventListener('click', () => select(i, d));
-      d.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(i, d); }
-        if (e.key === 'ArrowDown') { e.preventDefault(); focusNext(i); }
-        if (e.key === 'ArrowUp') { e.preventDefault(); focusPrev(i); }
-      });
-      listEl.appendChild(d);
-    });
-    // auto-select first for convenience
-    const first = listEl.querySelector('.item');
-    if (first) first.focus();
-  }
-
-  function focusNext(i){
-    const items = Array.from(document.querySelectorAll('.item'));
-    const next = items[i+1] || items[0];
-    next.focus();
-  }
-  function focusPrev(i){
-    const items = Array.from(document.querySelectorAll('.item'));
-    const prev = items[i-1] || items[items.length-1];
-    prev.focus();
-  }
-
-  function select(i, el) {
-    if (selectedEl) selectedEl.classList.remove('selected');
-    el.classList.add('selected');
-    selectedEl = el;
-    selectedText = reviews[i];
-    copyBtn.disabled = false;
-  }
-
-  copyBtn.addEventListener('click', async () => {
-    if (!selectedText) return;
-    try {
-      await navigator.clipboard.writeText(selectedText);
-    } catch (e) {
-      // ignore; some browsers may block clipboard on file:// — still open GMB so user can paste manually
-    }
-    window.open(GMB, '_blank');
+// ALWAYS LOAD FRESH JSON (cache FIX) 🔥
+fetch("reviews.json?v=" + Date.now(), { cache: "no-store" })
+  .then(r => r.json())
+  .then(j => {
+    reviews = j.reviews || [];
+    render();
+  })
+  .catch(() => {
+    reviews = ["Error loading reviews.json"];
+    render();
   });
 
-  // initialize
-  render();
+function render(){
+  listEl.innerHTML = "";
+  reviews.forEach((txt, i) => {
+    const d = document.createElement("div");
+    d.className = "item";
+    d.innerText = txt;
+    d.addEventListener("click", () => select(i, d));
+    listEl.appendChild(d);
+  });
+}
+
+function select(i, el){
+  if(selectedEl) selectedEl.classList.remove("selected");
+  el.classList.add("selected");
+  selectedEl = el;
+  selectedText = reviews[i];
+  copyBtn.disabled = false;
+}
+
+copyBtn.addEventListener("click", async () => {
+  try{
+    await navigator.clipboard.writeText(selectedText);
+  }catch(e){}
+  window.open("https://g.page/r/CV0F0rtdcU-_EBE/review", "_blank");
+});
 </script>
+
 </body>
 </html>
