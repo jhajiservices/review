@@ -27,12 +27,18 @@ body{
 }
 
 .header{
-  background:linear-gradient(135deg,#1a5cff,#1f6bff);
-  padding:18px;
-  color:#fff;
-  display:flex;
-  gap:14px;
+  position:relative;
 }
+
+.edit-icon{
+  position:absolute;
+  top:14px;
+  right:14px;
+  opacity:.35;
+}
+<div class="edit-icon">
+  ✏️
+</div>
 
 .logo{
   width:54px;
@@ -97,14 +103,22 @@ body{
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .review{
-  background:#f6f8ff;
-  border-radius:14px;
-  padding:16px;
-  font-size:15px;
-  line-height:1.5;
-  min-height:110px;
+  position:relative;
+  padding-left:36px;
 }
 
+.review{
+  position:relative;
+  padding-left:42px;
+}
+
+.review::before{
+  content:"✨";
+  position:absolute;
+  left:12px;
+  top:14px;
+  font-size:16px;
+}
 .btn{
   width:100%;
   margin-top:18px;
