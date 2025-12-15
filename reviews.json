@@ -1,8 +1,31 @@
 {
-  "reviews": [
-    "Great service! Very professional and quick.Bahut hi Accha Experience Raha.",
-    "Excellent experience, highly recommended!Best plumber & Electrician in kharadi",
-    "Work done perfectly. Fully satisfied with Jhaji Services.",
-    "Great Service.Fast Response..\nJhaji Services best Service in the Kharadi & Near by Area "
+  "intro": [
+    "Just got service from",
+    "Recently hired",
+    "Had a great experience with",
+    "Used the services of"
+  ],
+  "service": [
+    "electrician work",
+    "plumbing repair",
+    "electrical and plumbing service",
+    "electrician and plumber service"
+  ],
+  "location": [
+    "in Kharadi",
+    "in Vadgaon Sheri",
+    "around Kharadi & Vadgaon Sheri"
+  ],
+  "detail": [
+    "The work was done neatly and on time.",
+    "The technician was professional and polite.",
+    "Everything was explained clearly before starting.",
+    "Quick response and quality workmanship."
+  ],
+  "ending": [
+    "Highly recommended!",
+    "Very reliable service.",
+    "Will definitely call again.",
+    "One of the best local service providers."
   ]
 }
