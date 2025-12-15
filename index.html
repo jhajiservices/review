@@ -3,199 +3,179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jhaji Services – AI Review</title>
+<title>Jhaji Services – Review</title>
 
 <style>
 body{
   margin:0;
-  font-family:system-ui,-apple-system;
-  background:linear-gradient(180deg,#eef3ff,#ffffff);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
+  background:linear-gradient(180deg,#e8f0ff 0%,#ffffff 55%);
   min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
 }
-.card{
-  width:94%;
+
+.wrapper{
   max-width:420px;
-  background:#fff;
-  border-radius:18px;
-  box-shadow:0 25px 45px rgba(0,0,0,.12);
+  margin:0 auto;
   padding:18px;
 }
-.header{
-  background:linear-gradient(135deg,#1a4fd8,#1a73e8);
-  border-radius:14px;
-  padding:16px;
+
+.top-card{
+  background:linear-gradient(135deg,#1a5cff,#1f6bff);
+  border-radius:18px;
+  padding:18px;
   color:#fff;
-}
-.header-top{
   display:flex;
-  gap:12px;
-  align-items:center;
+  gap:14px;
+  box-shadow:0 14px 35px rgba(26,92,255,.35);
 }
+
 .logo{
-  width:44px;
-  height:44px;
+  width:54px;
+  height:54px;
   border-radius:50%;
+  object-fit:cover;
   background:#fff;
-  padding:4px;
 }
-.title{font-size:18px;font-weight:700}
-.stars{color:#FFD700;font-size:14px}
-.sub{font-size:12px;opacity:.9}
+
+.name{
+  font-size:20px;
+  font-weight:700;
+}
+
+.stars{
+  color:#ffd43b;
+  font-size:17px;
+  margin:4px 0;
+}
+
+.verified{
+  font-weight:700;
+  color:#eaf1ff;
+}
+
+.services{
+  font-size:14px;
+  opacity:.95;
+}
+
 .badge{
-  margin-top:6px;
   display:inline-block;
-  background:rgba(255,255,255,.15);
+  margin-top:8px;
+  background:rgba(255,255,255,.18);
   padding:4px 10px;
   border-radius:999px;
   font-size:12px;
   font-weight:600;
 }
-.section{
-  margin-top:14px;
+
+.white-card{
+  margin-top:16px;
+  background:#fff;
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.12);
 }
-label{font-size:13px;font-weight:600}
-select{
-  width:100%;
-  margin-top:6px;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ddd;
+
+.ai{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  color:#444;
+  margin-bottom:10px;
 }
-.loader{
-  margin:22px auto 10px;
-  width:38px;
-  height:38px;
-  border:4px solid #e0e7ff;
-  border-top-color:#1a73e8;
+
+.spinner{
+  width:22px;
+  height:22px;
+  border:3px solid #dbe5ff;
+  border-top:3px solid #1a5cff;
   border-radius:50%;
   animation:spin 1s linear infinite;
 }
+
 @keyframes spin{to{transform:rotate(360deg)}}
+
 .review{
-  display:none;
-  background:#f8f9fa;
+  background:#f6f8ff;
   border-radius:14px;
   padding:16px;
-  font-size:14px;
-  line-height:1.55;
-}
-.review[contenteditable]{outline:2px dashed #1a73e8}
-button{
-  display:none;
-  width:100%;
-  margin-top:16px;
-  background:#1a73e8;
-  border:none;
-  padding:14px;
-  border-radius:14px;
-  color:#fff;
   font-size:15px;
-  font-weight:700;
+  line-height:1.5;
 }
+
+.btn{
+  width:100%;
+  margin-top:18px;
+  padding:14px;
+  background:#1a5cff;
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
 .footer{
   text-align:center;
-  font-size:11px;
-  color:#999;
-  margin-top:12px;
+  margin-top:14px;
+  font-size:12px;
+  color:#888;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="wrapper">
 
-  <div class="header">
-    <div class="header-top">
-      <img src="logo.png" class="logo">
-      <div>
-        <div class="title">Jhaji Services</div>
-        <div class="stars">⭐⭐⭐⭐⭐</div>
-        <div class="sub">
-  <span style="font-weight:600;">
-    Verified Service Partner <span style="color:#1a73e8;">✔</span>
-  </span><br>
-  <small style="color:#6b7280;">
-    Electrical, Plumbing & Repair Services
-  </small>
-</div>
-        <div class="badge">✨ AI Review Assistant</div>
-      </div>
+  <!-- BLUE HEADER CARD -->
+  <div class="top-card">
+    <img src="logo.png" class="logo">
+    <div>
+      <div class="name">Jhaji Services</div>
+      <div class="stars">★★★★★</div>
+      <div class="verified">✔ Verified Service Partner</div>
+      <div class="services">Electrical, Plumbing & Repair Services</div>
+      <div class="badge">✨ AI Review Assistant</div>
     </div>
   </div>
 
-  <div class="section">
-    <label>⭐ Select Rating</label>
-    <select id="rating">
-      <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
-      <option value="4">⭐⭐⭐⭐ (Good)</option>
-    </select>
+  <!-- WHITE REVIEW CARD -->
+  <div class="white-card">
+    <div class="ai">
+      <div class="spinner"></div>
+      <div>✨ AI is crafting your review...</div>
+    </div>
+
+    <div class="review" id="reviewText">Loading...</div>
+
+    <button class="btn" onclick="copyAndGo()">
+      Copy Review & Continue
+    </button>
   </div>
 
-  <div class="section">
-    <label>🎯 Select Experience</label>
-    <select id="tone">
-      <option value="professional">Professional</option>
-      <option value="fast">Fast Service</option>
-      <option value="friendly">Friendly</option>
-    </select>
+  <div class="footer">
+    Powered by AI • Authentic Reviews
   </div>
-
-  <div class="loader" id="loader"></div>
-
-  <div class="review" id="reviewBox" contenteditable="true"></div>
-
-  <button id="copyBtn">📋 Copy Review & Continue</button>
-
-  <div class="footer">Powered by AI · Authentic Reviews</div>
 
 </div>
 
 <script>
-// prevent repeat on same device
-if(localStorage.getItem("jhaji_review_done")){
-  document.querySelector(".card").innerHTML =
-  "<h3 style='text-align:center'>✅ Review already generated on this device</h3>";
-  throw new Error();
-}
-
-const services=["electrician","plumber","electrician & plumber"];
-const areas=["Kharadi","Vadgaon Sheri"];
-const professional=[
- "The technician was very professional and skilled.",
- "Work was done neatly with proper explanation.",
- "Highly professional service and fair pricing."
-];
-const fast=[
- "Quick response and work completed on time.",
- "Very fast service without any delay.",
- "Same-day service with excellent results."
-];
-const friendly=[
- "Very polite and friendly technician.",
- "Felt comfortable and well guided.",
- "Friendly service with honest suggestions."
+const reviews=[
+ "Excellent experience with Jhaji Services. Professional work, polite technician and very smooth service. Highly recommended.",
+ "Jhaji Services provided quick and reliable service. Clean work and friendly behaviour. Fully satisfied.",
+ "Very professional service by Jhaji Services. Quality work and hassle-free experience. Would definitely recommend.",
+ "Great experience with Jhaji Services. On-time service, neat work and trustworthy professionals."
 ];
 
-function r(a){return a[Math.floor(Math.random()*a.length)]}
+const review=reviews[Math.floor(Math.random()*reviews.length)];
+document.getElementById("reviewText").innerText=review;
 
-setTimeout(()=>{
-  const tone=document.getElementById("tone").value;
-  const rating=document.getElementById("rating").value;
-  const text=`I recently hired Jhaji Services for ${r(services)} work in ${r(areas)}. ${r(tone==="professional"?professional:tone==="fast"?fast:friendly)} Overall experience was great and I am happy with the quality of work. ${rating==5?"Highly recommended!":"Good service and value for money."}`;
-  loader.style.display="none";
-  reviewBox.style.display="block";
-  reviewBox.innerText=text;
-  copyBtn.style.display="block";
-},1800);
-
-copyBtn.onclick=()=>{
-  navigator.clipboard.writeText(reviewBox.innerText);
-  localStorage.setItem("jhaji_review_done","yes");
-  window.location.href="https://g.page/r/CV0F0rtdcU-_EBE/review";
+function copyAndGo(){
+ navigator.clipboard.writeText(review);
+ window.location.href="https://g.page/r/CV0F0rtdcU-_EBE/review";
 }
 </script>
 
