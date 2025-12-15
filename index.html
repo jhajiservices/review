@@ -8,113 +8,102 @@
 <style>
 body{
   margin:0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-  background:#f1f3f4;
-  padding:18px;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont;
+  background:linear-gradient(180deg,#eef3ff,#ffffff);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
-
 .card{
+  width:94%;
   max-width:420px;
-  margin:auto;
   background:#fff;
   border-radius:18px;
-  box-shadow:0 12px 30px rgba(0,0,0,.08);
+  box-shadow:0 25px 45px rgba(0,0,0,.12);
   padding:18px;
 }
-
 .header{
+  background:linear-gradient(135deg,#1a4fd8,#1a73e8);
+  border-radius:14px;
+  padding:16px;
+  color:#fff;
+}
+.header-top{
   display:flex;
   gap:12px;
   align-items:center;
 }
-
 .logo{
-  width:56px;
-  height:56px;
+  width:44px;
+  height:44px;
   border-radius:50%;
-  object-fit:contain;
+  background:#fff;
+  padding:4px;
 }
-
 .title{
   font-size:18px;
   font-weight:700;
-  color:#202124;
 }
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  margin-top:6px;
-  padding:4px 10px;
+.stars{
+  color:#FFD700;
+  font-size:14px;
+  margin-top:2px;
+}
+.sub{
   font-size:12px;
-  border-radius:20px;
-  background:#e8f0fe;
-  color:#1a73e8;
+  opacity:.9;
+  margin-top:4px;
+}
+.badge{
+  margin-top:6px;
+  display:inline-block;
+  background:rgba(255,255,255,.15);
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
   font-weight:600;
 }
-
-.dot{
-  width:8px;
-  height:8px;
-  background:#1a73e8;
-  border-radius:50%;
-}
-
-.sub{
-  margin-top:6px;
-  font-size:13px;
-  color:#5f6368;
-}
-
 .loader{
-  text-align:center;
-  padding:32px 0;
-}
-
-.spinner{
-  width:28px;
-  height:28px;
-  border:3px solid #d2e3fc;
-  border-top:3px solid #1a73e8;
+  margin:28px auto 12px;
+  width:42px;
+  height:42px;
+  border:4px solid #e0e7ff;
+  border-top-color:#1a73e8;
   border-radius:50%;
   animation:spin 1s linear infinite;
-  margin:auto;
 }
-
-@keyframes spin{
-  to{transform:rotate(360deg);}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-text{
+  text-align:center;
+  font-weight:600;
+  margin-bottom:14px;
 }
-
-.review-box{
+.review{
   display:none;
-  margin-top:16px;
   background:#f8f9fa;
   border-radius:14px;
-  padding:14px;
-  font-size:15px;
-  line-height:1.5;
-  color:#202124;
+  padding:16px;
+  font-size:14px;
+  line-height:1.55;
 }
-
 button{
-  margin-top:14px;
+  display:none;
   width:100%;
-  padding:14px;
-  border:none;
-  border-radius:12px;
+  margin-top:18px;
   background:#1a73e8;
+  border:none;
+  padding:14px;
+  border-radius:14px;
   color:#fff;
-  font-size:16px;
+  font-size:15px;
   font-weight:700;
-  cursor:pointer;
 }
-
-.note{
-  margin-top:10px;
-  font-size:12px;
-  color:#5f6368;
+.footer{
   text-align:center;
+  font-size:11px;
+  color:#999;
+  margin-top:12px;
 }
 </style>
 </head>
@@ -124,83 +113,62 @@ button{
 <div class="card">
 
   <div class="header">
-    <img src="logo.png" class="logo" alt="Jhaji Services">
-    <div>
-      <div class="title">Jhaji Services</div>
-      <div class="badge">
-        <span class="dot"></span>
-        AI Review Assistant
+    <div class="header-top">
+      <img src="logo.png" class="logo">
+      <div>
+        <div class="title">Jhaji Services</div>
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <div class="sub">Electrician & Plumber · Kharadi & Vadgaon Sheri</div>
+        <div class="badge">✨ AI Review Assistant</div>
       </div>
-      <div class="sub">Electrician & Plumber · Kharadi & Vadgaon Sheri</div>
     </div>
   </div>
 
-  <div id="loader" class="loader">
-    <div class="spinner"></div>
-    <p style="margin-top:12px;font-weight:600">✨ AI is crafting your review…</p>
-  </div>
+  <div class="loader" id="loader"></div>
+  <div class="ai-text" id="aiText">✨ AI is crafting your review...</div>
 
-  <div id="reviewBox" class="review-box">
-    <div id="reviewText"></div>
-    <button onclick="copyAndGo()">Copy Review & Continue</button>
-    <div class="note">You can edit the review before posting on Google.</div>
-  </div>
+  <div class="review" id="reviewBox"></div>
+
+  <button id="copyBtn">📋 Copy Review & Continue</button>
+
+  <div class="footer">Powered by AI · Authentic Reviews</div>
 
 </div>
 
 <script>
-const intro = [
-  "Just got service from",
-  "Recently hired",
-  "Had a great experience with",
-  "Used the services of"
+const services=[
+ "electrician service",
+ "plumbing work",
+ "electrician and plumber service"
 ];
-
-const service = [
-  "electrician and plumber service",
-  "electrical and plumbing work",
-  "electrician and plumbing repair"
+const qualities=[
+ "quick and professional",
+ "very polite and skilled",
+ "on-time and neatly done",
+ "honest and reliable"
 ];
-
-const location = [
-  "in Kharadi",
-  "in Vadgaon Sheri",
-  "around Kharadi & Vadgaon Sheri"
+const areas=["Kharadi","Vadgaon Sheri"];
+const endings=[
+ "Highly recommended!",
+ "Very satisfied with the service.",
+ "Will definitely call again.",
+ "Great experience overall."
 ];
+function r(a){return a[Math.floor(Math.random()*a.length)]}
 
-const detail = [
-  "The work was done neatly and on time.",
-  "The technician was professional and polite.",
-  "Everything was explained clearly before starting.",
-  "Quick response and quality workmanship."
-];
+const review=`I recently used Jhaji Services for ${r(services)} in ${r(areas)}. The technician was ${r(qualities)} and handled everything smoothly. The work quality was excellent and pricing was fair. ${r(endings)}`;
 
-const ending = [
-  "Highly recommended!",
-  "Very reliable service.",
-  "Will definitely call again.",
-  "One of the best local service providers."
-];
+setTimeout(()=>{
+  loader.style.display="none";
+  aiText.style.display="none";
+  reviewBox.style.display="block";
+  reviewBox.innerText=review;
+  copyBtn.style.display="block";
+},2000);
 
-function pick(arr){
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-const reviewText =
-  `${pick(intro)} Jhaji Services for ${pick(service)} ${pick(location)}. `
-+ `${pick(detail)} ${pick(ending)}`;
-
-setTimeout(() => {
-  document.getElementById("loader").style.display = "none";
-  document.getElementById("reviewText").innerText = reviewText;
-  document.getElementById("reviewBox").style.display = "block";
-}, 1800);
-
-function copyAndGo(){
-  navigator.clipboard.writeText(reviewText).then(() => {
-    window.location.href =
-      "https://g.page/r/CV0F0rtdcU-_EBE/review";
-  });
+copyBtn.onclick=()=>{
+  navigator.clipboard.writeText(review);
+  window.location.href="https://g.page/r/CV0F0rtdcU-_EBE/review";
 }
 </script>
 
