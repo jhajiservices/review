@@ -165,12 +165,12 @@ body{
 
   <div class="review-area">
     <div class="review-box">
-      <span style="color:#f97316;">● </span>
+      <span style="color:#f97316;"></span>
       <span id="reviewText"></span><span class="cursor"></span>
     </div>
 
     <button class="copy-btn" onclick="copyReview()">
-      Copy Review & Continue 📋
+      Copy Review & Continue 📄
     </button>
   </div>
 
@@ -194,7 +194,7 @@ function startTyping(text){
   function type(){
     if(i<text.length){
       el.textContent+=text.charAt(i++);
-      setTimeout(type,70); // slow & premium typing
+      setTimeout(type,30); // slow & premium typing
     }
   }
   type();
