@@ -8,7 +8,7 @@
 <style>
 body{
   margin:0;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont;
+  font-family:system-ui,-apple-system;
   background:linear-gradient(180deg,#eef3ff,#ffffff);
   min-height:100vh;
   display:flex;
@@ -41,20 +41,9 @@ body{
   background:#fff;
   padding:4px;
 }
-.title{
-  font-size:18px;
-  font-weight:700;
-}
-.stars{
-  color:#FFD700;
-  font-size:14px;
-  margin-top:2px;
-}
-.sub{
-  font-size:12px;
-  opacity:.9;
-  margin-top:4px;
-}
+.title{font-size:18px;font-weight:700}
+.stars{color:#FFD700;font-size:14px}
+.sub{font-size:12px;opacity:.9}
 .badge{
   margin-top:6px;
   display:inline-block;
@@ -64,21 +53,27 @@ body{
   font-size:12px;
   font-weight:600;
 }
+.section{
+  margin-top:14px;
+}
+label{font-size:13px;font-weight:600}
+select{
+  width:100%;
+  margin-top:6px;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
 .loader{
-  margin:28px auto 12px;
-  width:42px;
-  height:42px;
+  margin:22px auto 10px;
+  width:38px;
+  height:38px;
   border:4px solid #e0e7ff;
   border-top-color:#1a73e8;
   border-radius:50%;
   animation:spin 1s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.ai-text{
-  text-align:center;
-  font-weight:600;
-  margin-bottom:14px;
-}
 .review{
   display:none;
   background:#f8f9fa;
@@ -87,10 +82,11 @@ body{
   font-size:14px;
   line-height:1.55;
 }
+.review[contenteditable]{outline:2px dashed #1a73e8}
 button{
   display:none;
   width:100%;
-  margin-top:18px;
+  margin-top:16px;
   background:#1a73e8;
   border:none;
   padding:14px;
@@ -124,10 +120,26 @@ button{
     </div>
   </div>
 
-  <div class="loader" id="loader"></div>
-  <div class="ai-text" id="aiText">✨ AI is crafting your review...</div>
+  <div class="section">
+    <label>⭐ Select Rating</label>
+    <select id="rating">
+      <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
+      <option value="4">⭐⭐⭐⭐ (Good)</option>
+    </select>
+  </div>
 
-  <div class="review" id="reviewBox"></div>
+  <div class="section">
+    <label>🎯 Select Experience</label>
+    <select id="tone">
+      <option value="professional">Professional</option>
+      <option value="fast">Fast Service</option>
+      <option value="friendly">Friendly</option>
+    </select>
+  </div>
+
+  <div class="loader" id="loader"></div>
+
+  <div class="review" id="reviewBox" contenteditable="true"></div>
 
   <button id="copyBtn">📋 Copy Review & Continue</button>
 
@@ -136,42 +148,49 @@ button{
 </div>
 
 <script>
-const services=[
- "electrician service",
- "plumbing work",
- "electrician and plumber service"
-];
-const qualities=[
- "quick and professional",
- "very polite and skilled",
- "on-time and neatly done",
- "honest and reliable"
-];
+// prevent repeat on same device
+if(localStorage.getItem("jhaji_review_done")){
+  document.querySelector(".card").innerHTML =
+  "<h3 style='text-align:center'>✅ Review already generated on this device</h3>";
+  throw new Error();
+}
+
+const services=["electrician","plumber","electrician & plumber"];
 const areas=["Kharadi","Vadgaon Sheri"];
-const endings=[
- "Highly recommended!",
- "Very satisfied with the service.",
- "Will definitely call again.",
- "Great experience overall."
+const professional=[
+ "The technician was very professional and skilled.",
+ "Work was done neatly with proper explanation.",
+ "Highly professional service and fair pricing."
 ];
+const fast=[
+ "Quick response and work completed on time.",
+ "Very fast service without any delay.",
+ "Same-day service with excellent results."
+];
+const friendly=[
+ "Very polite and friendly technician.",
+ "Felt comfortable and well guided.",
+ "Friendly service with honest suggestions."
+];
+
 function r(a){return a[Math.floor(Math.random()*a.length)]}
 
-const review=`I recently used Jhaji Services for ${r(services)} in ${r(areas)}. The technician was ${r(qualities)} and handled everything smoothly. The work quality was excellent and pricing was fair. ${r(endings)}`;
-
 setTimeout(()=>{
+  const tone=document.getElementById("tone").value;
+  const rating=document.getElementById("rating").value;
+  const text=`I recently hired Jhaji Services for ${r(services)} work in ${r(areas)}. ${r(tone==="professional"?professional:tone==="fast"?fast:friendly)} Overall experience was great and I am happy with the quality of work. ${rating==5?"Highly recommended!":"Good service and value for money."}`;
   loader.style.display="none";
-  aiText.style.display="none";
   reviewBox.style.display="block";
-  reviewBox.innerText=review;
+  reviewBox.innerText=text;
   copyBtn.style.display="block";
-},2000);
+},1800);
 
 copyBtn.onclick=()=>{
-  navigator.clipboard.writeText(review);
+  navigator.clipboard.writeText(reviewBox.innerText);
+  localStorage.setItem("jhaji_review_done","yes");
   window.location.href="https://g.page/r/CV0F0rtdcU-_EBE/review";
 }
 </script>
 
 </body>
 </html>
-
