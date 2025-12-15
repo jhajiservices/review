@@ -3,111 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jhaji Services – AI Review Assistant</title>
+<title>Jhaji Services – AI Review</title>
 
 <style>
-  body{
-    margin:0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-    background:#f1f3f4;
-    padding:18px;
-  }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  background:#f1f3f4;
+  padding:18px;
+}
 
-  .card{
-    max-width:420px;
-    margin:auto;
-    background:#ffffff;
-    border-radius:18px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-    padding:18px;
-  }
+.card{
+  max-width:420px;
+  margin:auto;
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.08);
+  padding:18px;
+}
 
-  .header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-  }
+.header{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
 
-  .logo{
-    width:56px;
-    height:56px;
-    border-radius:12px;
-    object-fit:contain;
-    background:#fff;
-  }
+.logo{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  object-fit:contain;
+}
 
-  .title{
-    font-size:18px;
-    font-weight:700;
-    color:#202124;
-  }
+.title{
+  font-size:18px;
+  font-weight:700;
+  color:#202124;
+}
 
-  .badge{
-    display:inline-block;
-    margin-top:6px;
-    padding:4px 10px;
-    font-size:12px;
-    border-radius:20px;
-    background:#e8f0fe;
-    color:#1a73e8;
-    font-weight:600;
-  }
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+  padding:4px 10px;
+  font-size:12px;
+  border-radius:20px;
+  background:#e8f0fe;
+  color:#1a73e8;
+  font-weight:600;
+}
 
-  .sub{
-    margin-top:6px;
-    font-size:13px;
-    color:#5f6368;
-  }
+.dot{
+  width:8px;
+  height:8px;
+  background:#1a73e8;
+  border-radius:50%;
+}
 
-  .loader{
-    text-align:center;
-    padding:30px 0;
-  }
+.sub{
+  margin-top:6px;
+  font-size:13px;
+  color:#5f6368;
+}
 
-  .spinner{
-    width:28px;
-    height:28px;
-    border:3px solid #d2e3fc;
-    border-top:3px solid #1a73e8;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
-    margin:auto;
-  }
+.loader{
+  text-align:center;
+  padding:32px 0;
+}
 
-  @keyframes spin{
-    to{transform:rotate(360deg);}
-  }
+.spinner{
+  width:28px;
+  height:28px;
+  border:3px solid #d2e3fc;
+  border-top:3px solid #1a73e8;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:auto;
+}
 
-  .review-box{
-    display:none;
-    margin-top:16px;
-    background:#f8f9fa;
-    border-radius:14px;
-    padding:14px;
-    font-size:15px;
-    line-height:1.5;
-    color:#202124;
-  }
+@keyframes spin{
+  to{transform:rotate(360deg);}
+}
 
-  button{
-    margin-top:14px;
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    background:#1a73e8;
-    color:#fff;
-    font-size:16px;
-    font-weight:700;
-    cursor:pointer;
-  }
+.review-box{
+  display:none;
+  margin-top:16px;
+  background:#f8f9fa;
+  border-radius:14px;
+  padding:14px;
+  font-size:15px;
+  line-height:1.5;
+  color:#202124;
+}
 
-  .note{
-    margin-top:10px;
-    font-size:12px;
-    color:#5f6368;
-    text-align:center;
-  }
+button{
+  margin-top:14px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:#1a73e8;
+  color:#fff;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.note{
+  margin-top:10px;
+  font-size:12px;
+  color:#5f6368;
+  text-align:center;
+}
 </style>
 </head>
 
@@ -115,36 +123,32 @@
 
 <div class="card">
 
-  <!-- HEADER -->
   <div class="header">
     <img src="logo.png" class="logo" alt="Jhaji Services">
     <div>
       <div class="title">Jhaji Services</div>
-      <div class="badge">✨ AI Review Assistant</div>
+      <div class="badge">
+        <span class="dot"></span>
+        AI Review Assistant
+      </div>
       <div class="sub">Electrician & Plumber · Kharadi & Vadgaon Sheri</div>
     </div>
   </div>
 
-  <!-- LOADER -->
   <div id="loader" class="loader">
     <div class="spinner"></div>
     <p style="margin-top:12px;font-weight:600">✨ AI is crafting your review…</p>
   </div>
 
-  <!-- REVIEW -->
   <div id="reviewBox" class="review-box">
     <div id="reviewText"></div>
     <button onclick="copyAndGo()">Copy Review & Continue</button>
-    <div class="note">
-      You can edit the review before posting on Google.
-    </div>
+    <div class="note">You can edit the review before posting on Google.</div>
   </div>
 
 </div>
 
 <script>
-/* ---------- AI LOGIC (SAFE & AUTO) ---------- */
-
 const intro = [
   "Just got service from",
   "Recently hired",
@@ -182,18 +186,18 @@ function pick(arr){
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-const review =
-`${pick(intro)} Jhaji Services for ${pick(service)} ${pick(location)}.
-${pick(detail)} ${pick(ending)}`;
+const reviewText =
+  `${pick(intro)} Jhaji Services for ${pick(service)} ${pick(location)}. `
++ `${pick(detail)} ${pick(ending)}`;
 
 setTimeout(() => {
   document.getElementById("loader").style.display = "none";
-  document.getElementById("reviewText").innerText = review;
+  document.getElementById("reviewText").innerText = reviewText;
   document.getElementById("reviewBox").style.display = "block";
-}, 2000);
+}, 1800);
 
 function copyAndGo(){
-  navigator.clipboard.writeText(review).then(() => {
+  navigator.clipboard.writeText(reviewText).then(() => {
     window.location.href =
       "https://g.page/r/CV0F0rtdcU-_EBE/review";
   });
