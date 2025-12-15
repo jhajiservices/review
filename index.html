@@ -9,7 +9,7 @@
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
-  background:linear-gradient(180deg,#e8f0ff 0%,#ffffff 55%);
+  background:linear-gradient(180deg,#e7efff 0%,#ffffff 60%);
   min-height:100vh;
 }
 
@@ -19,22 +19,27 @@ body{
   padding:18px;
 }
 
-.top-card{
+.card{
+  background:#fff;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.header{
   background:linear-gradient(135deg,#1a5cff,#1f6bff);
-  border-radius:18px;
   padding:18px;
   color:#fff;
   display:flex;
   gap:14px;
-  box-shadow:0 14px 35px rgba(26,92,255,.35);
 }
 
 .logo{
   width:54px;
   height:54px;
   border-radius:50%;
-  object-fit:cover;
   background:#fff;
+  object-fit:cover;
 }
 
 .name{
@@ -50,7 +55,6 @@ body{
 
 .verified{
   font-weight:700;
-  color:#eaf1ff;
 }
 
 .services{
@@ -60,23 +64,19 @@ body{
 
 .badge{
   display:inline-block;
-  margin-top:8px;
-  background:rgba(255,255,255,.18);
+  margin-top:6px;
+  background:rgba(255,255,255,.2);
   padding:4px 10px;
   border-radius:999px;
   font-size:12px;
   font-weight:600;
 }
 
-.white-card{
-  margin-top:16px;
-  background:#fff;
-  border-radius:18px;
+.content{
   padding:18px;
-  box-shadow:0 12px 30px rgba(0,0,0,.12);
 }
 
-.ai{
+.ai-line{
   display:flex;
   align-items:center;
   gap:10px;
@@ -86,8 +86,8 @@ body{
 }
 
 .spinner{
-  width:22px;
-  height:22px;
+  width:20px;
+  height:20px;
   border:3px solid #dbe5ff;
   border-top:3px solid #1a5cff;
   border-radius:50%;
@@ -102,6 +102,7 @@ body{
   padding:16px;
   font-size:15px;
   line-height:1.5;
+  min-height:110px;
 }
 
 .btn{
@@ -119,7 +120,7 @@ body{
 
 .footer{
   text-align:center;
-  margin-top:14px;
+  margin-top:12px;
   font-size:12px;
   color:#888;
 }
@@ -129,53 +130,72 @@ body{
 <body>
 
 <div class="wrapper">
+  <div class="card">
 
-  <!-- BLUE HEADER CARD -->
-  <div class="top-card">
-    <img src="logo.png" class="logo">
-    <div>
-      <div class="name">Jhaji Services</div>
-      <div class="stars">★★★★★</div>
-      <div class="verified">✔ Verified Service Partner</div>
-      <div class="services">Electrical, Plumbing & Repair Services</div>
-      <div class="badge">✨ AI Review Assistant</div>
-    </div>
-  </div>
-
-  <!-- WHITE REVIEW CARD -->
-  <div class="white-card">
-    <div class="ai">
-      <div class="spinner"></div>
-      <div>✨ AI is crafting your review...</div>
+    <!-- HEADER -->
+    <div class="header">
+      <img src="logo.png" class="logo">
+      <div>
+        <div class="name">Jhaji Services</div>
+        <div class="stars">★★★★★</div>
+        <div class="verified">✔ Verified Service Partner</div>
+        <div class="services">Electrical, Plumbing & Repair Services</div>
+        <div class="badge">✨ AI Review Assistant</div>
+      </div>
     </div>
 
-    <div class="review" id="reviewText">Loading...</div>
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="ai-line">
+        <div class="spinner"></div>
+        <div>✨ AI is writing your review...</div>
+      </div>
 
-    <button type="button" class="btn" onclick="copyAndGo()">
-  Copy Review & Continue <span style="opacity:.8">⧉</span>
-</button>
+      <div class="review" id="reviewBox"></div>
+
+      <button type="button" class="btn" onclick="copyAndGo()">
+        Copy Review & Continue ⧉
+      </button>
+    </div>
+
   </div>
 
   <div class="footer">
     Powered by AI • Authentic Reviews
   </div>
-
 </div>
 
 <script>
+/* REVIEW POOL */
 const reviews=[
- "Excellent experience with Jhaji Services. Professional work, polite technician and very smooth service. Highly recommended.",
- "Jhaji Services provided quick and reliable service. Clean work and friendly behaviour. Fully satisfied.",
- "Very professional service by Jhaji Services. Quality work and hassle-free experience. Would definitely recommend.",
- "Great experience with Jhaji Services. On-time service, neat work and trustworthy professionals."
+ "Excellent experience with Jhaji Services. The technician was professional, punctual and completed the work neatly. Highly recommended.",
+ "Jhaji Services provided fast and reliable service. Very polite behaviour and quality work. Fully satisfied.",
+ "Great service by Jhaji Services. Clean work, honest pricing and smooth experience. Would definitely recommend.",
+ "Very professional and trustworthy service from Jhaji Services. On-time work and good support.",
+ "Satisfied with Jhaji Services. Everything was handled neatly and the service quality was excellent.",
+ "Jhaji Services did a clean and hassle-free job. Friendly staff and smooth experience overall."
 ];
 
-const review=reviews[Math.floor(Math.random()*reviews.length)];
-document.getElementById("reviewText").innerText=review;
+/* PICK RANDOM REVIEW */
+const text = reviews[Math.floor(Math.random()*reviews.length)];
 
+/* TYPING EFFECT (SLOW) */
+let i=0;
+const box=document.getElementById("reviewBox");
+
+function type(){
+  if(i < text.length){
+    box.innerHTML += text.charAt(i);
+    i++;
+    setTimeout(type, 60); // ⬅️ TYPING SPEED (change 60 → 70 for slower)
+  }
+}
+type();
+
+/* COPY & REDIRECT */
 function copyAndGo(){
- navigator.clipboard.writeText(review);
- window.location.href="https://g.page/r/CV0F0rtdcU-_EBE/review";
+  navigator.clipboard.writeText(text);
+  window.location.href="https://g.page/r/CV0F0rtdcU-_EBE/review";
 }
 </script>
 
