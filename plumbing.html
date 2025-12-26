@@ -197,10 +197,14 @@ function type(){
 type();
 
 function copyReview(){
-  navigator.clipboard.writeText(el.textContent);
-  window.location.href = "https://g.page/r/CV0F0rtdcU-_EBE/review";
-}
-</script>
+  const reviewText = document.getElementById("reviewText").textContent;
 
-</body>
-</html>
+  navigator.clipboard.writeText(reviewText).then(() => {
+    setTimeout(() => {
+      window.open(
+        "https://g.page/r/CV0F0rtdcU-_EBE/review",
+        "_blank"
+      );
+    }, 300);
+  });
+}
