@@ -172,9 +172,21 @@ const reviews = [
   "Trusted plumbing service partner. Jhaji Services delivered quality work with honest pricing and timely support."
 ];
 
-const text = reviews[Math.floor(Math.random()*reviews.length)];
-const el = document.getElementById("reviewText");
-let i = 0;
+fetch("plumbing.json")
+  .then(res => res.json())
+  .then(reviews => {
+    const text = reviews[Math.floor(Math.random() * reviews.length)];
+    const el = document.getElementById("reviewText");
+    let i = 0;
+
+    function type(){
+      if(i < text.length){
+        el.textContent += text.charAt(i++);
+        setTimeout(type, 60);
+      }
+    }
+    type();
+  });
 
 function type(){
   if(i < text.length){
